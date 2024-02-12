@@ -2,6 +2,8 @@ package com.practise.categorymapping.service;
 
 import java.util.List;
 
+import javax.management.RuntimeErrorException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,19 +25,31 @@ public class CategoryServiceImp implements CategoryService{
 
 	@Override
 	public String newCategory(Category category) {
-		categoryRepository.save(category);
-		return "New Category Created";
+		if(categoryRepository.save(category) != null) {
+			return "New Category Created";
+		}else {
+			throw new RuntimeException("Category was not saved in the database");
+		}
 	}
 
 	@Override
 	public String deleteCategory(int categoryId) {
-		categoryRepository.deleteById(categoryId);
-		return "Category Deleted";
+		if(categoryRepository.existsById(categoryId) == true) {
+			categoryRepository.deleteById(categoryId);
+			return "Category Deleted";
+		}else {
+			throw new RuntimeException("Id was not available in the database.");
+		}
 	}
 
 	@Override
 	public List<ResponceProductInfo> viewAllProductsinCategory(int categoryId) {
-		return categoryRepository.allProductsInCategory(categoryId);
+		if(categoryRepository.existsById(categoryId)) {
+			return categoryRepository.allProductsInCategory(categoryId);
+		}
+		else {
+			throw new RuntimeException("Category Id was not available in the database.");
+		}
 	}
 
 }
